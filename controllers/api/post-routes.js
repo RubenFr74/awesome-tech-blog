@@ -69,3 +69,44 @@ router.get("/:id", (req, res) => {
             res.status(500).json(err);
         });
 });
+
+// Create a post
+router.post("/", withAuth, (req, res) => {
+    console.log("creating");
+    Post.create({
+            title: req.body.title,
+            content: req.body.post_content,
+            user_id: req.session.user_id
+        })
+        .then((dbPostData) => res.json(dbPostData))
+        .catch((err) => {
+            console.log(err);
+            res.status(500).json(err);
+        });
+});
+
+// Update a post
+router.put("/:id", withAuth, (req, res) => {
+    Post.update({
+            title: req.body.title,
+            content: req.body.post_content,
+        }, {
+            where: {
+                id: req.params.id,
+            },
+        })
+        .then((dbPostData) => {
+            if (!dbPostData) {
+                res.status(404).json({
+                    message: "No post found with this id"
+                });
+                return;
+            }
+            res.json(dbPostData);
+        })
+        .catch((err) => {
+            console.log(err);
+            res.status(500).json(err);
+        });
+});
+
